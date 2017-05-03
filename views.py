@@ -11,32 +11,33 @@ def postList(request, flow=None, tag=None, group=None):
     ''' Логика страницы со списком статей '''
 
     if flow:
-        postObj_list = Article.objects.filter(flow__sys_name=flow)
+        query_list = Article.objects.filter(flow__sys_name=flow)
 
     elif tag:
-        postObj_list = Article.objects.filter(tags__sys_name=tag)
+        query_list = Article.objects.filter(tags__sys_name=tag)
 
     elif group:
-        post_tags    = Tag.objects.filter(group__sys_name=group)
-        postObj_list = Article.objects.filter(
-                        tags__sys_name__in=[tag.sys_name for tag in post_tags]
-                       ).distinct()
+        post_tags  = Tag.objects.filter(group__sys_name=group)
+        query_list = Article.objects.filter(tags__sys_name__in=[tag.sys_name for tag in post_tags]).distinct()
+
     else:
-        postObj_list = Article.objects.all()
+        query_list = Article.objects.all()
 
     #filter non-publisher articles
-    postObj_list = postObj_list.filter(published_date__isnull=False)
-    #paginator
-    paginator = Paginator(postObj_list, 5)
+    query_list = query_list.filter(published_date__isnull=False)
+
+    paginator = Paginator(query_list, 10)
     page = request.GET.get('page')
+
     try:
-        contacts = paginator.page(page)
+        postObj_list = paginator.page(page)
     except PageNotAnInteger:
-        contacts = paginator.page(1)
+        postObj_list = paginator.page(1)
     except EmptyPage:
-        contacts = paginator.page(paginator.num_pages)
+        postObj_list = paginator.page(paginator.num_pages)
+
     return render(request, 'pages/postList.html', {
-        'postObj_list': contacts,
+        'postObj_list': postObj_list,
     })
 
 
