@@ -12,16 +12,20 @@ def postList(request, flow=None, tag=None, group=None):
 
     if flow:
         query_list = Article.objects.filter(flow__sys_name=flow)
+        page_title = Flow.objects.get(sys_name = flow).name
 
     elif tag:
         query_list = Article.objects.filter(tags__sys_name=tag)
+        page_title = Tag.objects.get(sys_name = tag).name
 
     elif group:
         post_tags  = Tag.objects.filter(group__sys_name=group)
         query_list = Article.objects.filter(tags__sys_name__in=[tag.sys_name for tag in post_tags]).distinct()
+        page_title = TagGroup.objects.get(sys_name = group).name
 
     else:
         query_list = Article.objects.all()
+        page_title = u'Последние статьи'
 
     #filter non-publisher articles
     query_list = query_list.filter(published_date__isnull=False)
@@ -38,6 +42,7 @@ def postList(request, flow=None, tag=None, group=None):
 
     return render(request, 'pages/postList.html', {
         'postObj_list': postObj_list,
+        'page_title'  : page_title,
     })
 
 
