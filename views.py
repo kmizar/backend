@@ -19,8 +19,7 @@ def postList(request, flow=None, tag=None, group=None):
         page_title = Tag.objects.get(sys_name = tag).name
 
     elif group:
-        post_tags  = Tag.objects.filter(group__sys_name=group)
-        query_list = Article.objects.filter(tags__sys_name__in=[tag.sys_name for tag in post_tags]).distinct()
+        query_list = Article.objects.filter(group__sys_name=group)
         page_title = TagGroup.objects.get(sys_name = group).name
 
     else:
@@ -61,15 +60,7 @@ def flowList(request):
     ''' Логика страницы со списком тегов и рубрик '''
 
     flowObj_list  = Flow.objects.all()
-    groupObj_list = [
-        { 'name' : group.name,
-          'icon' : group.icon,
-          'tags' : Tag.objects.all().filter(group_id = group.id),
-          'description': group.description,
-          'sys_name'   : group.sys_name,
-        }
-        for group in TagGroup.objects.all()
-    ]
+    groupObj_list = TagGroup.objects.all()
 
     return render(request, 'pages/flowList.html', {
         'flowObj_list' : flowObj_list,

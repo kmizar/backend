@@ -16,13 +16,27 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django_resized import ResizedImageField
 
 
+class Tag(models.Model):
+    ''' Теги статьи '''
+
+    name = models.CharField(max_length=50, unique=True, blank=False)
+    sys_name     = models.CharField(max_length=50, unique=True, blank=False)
+    created_date = models.DateTimeField(default=timezone.now)
+
+    def  __str__(self):
+        return self.sys_name
+
+
 class TagGroup(models.Model):
     ''' Группировка тегов '''
 
     name = models.CharField(max_length=100, unique=True, blank=False)
-    icon = ResizedImageField(size=[190,140], upload_to='tag_group_icons/',null=True)
+    icon = ResizedImageField(size=[280,190], upload_to='tag_group_icons/',null=True)
     sys_name    = models.CharField(max_length=100, unique=True, blank=False)
     description = models.CharField(max_length=250, null=True)
+
+    #Связь с группой (много тегов -> много групп)
+    tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
         return self.sys_name
@@ -35,24 +49,7 @@ class Flow(models.Model):
     sys_name     = models.CharField(max_length=100, unique=True, blank=False)
     created_date = models.DateTimeField(default=timezone.now)
 
-    #Связь с группой (много тегов -> одна группа)
-    group = models.ManyToManyField(TagGroup, blank=True)
-
     def __str__(self):
-        return self.sys_name
-
-
-class Tag(models.Model):
-    ''' Теги статьи '''
-
-    name = models.CharField(max_length=50, unique=True, blank=False)
-    sys_name     = models.CharField(max_length=50, unique=True, blank=False)
-    created_date = models.DateTimeField(default=timezone.now)
-
-    #Связь с группой (много тегов -> одна группа)
-    group = models.ForeignKey(TagGroup, blank=False, on_delete=models.CASCADE)
-
-    def  __str__(self):
         return self.sys_name
 
 
@@ -67,8 +64,9 @@ class Article(models.Model):
     published_date = models.DateTimeField(blank=True, null=True)
 
     #Связи с темой и тегами статьи
-    flow = models.ForeignKey(Flow, blank=False, on_delete=models.CASCADE)
-    tags = models.ManyToManyField(Tag, blank=True)
+    flow  = models.ForeignKey(Flow, blank=False, on_delete=models.CASCADE)
+    tags  = models.ManyToManyField(Tag, blank=True)
+    group = models.ManyToManyField(TagGroup, blank=True)
 
     def publich(self):
         self.published_date = timezone.now()
