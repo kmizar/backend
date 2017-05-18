@@ -26,8 +26,8 @@ def postList(request, flow=None, tag=None, group=None):
         query_list = Article.objects.all()
         page_title = u'Последние статьи'
 
-    #filter non-publisher articles
-    query_list = query_list.filter(published_date__isnull=False)
+    #filter non-publisher articles and sort data by date publish
+    query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
 
     paginator = Paginator(query_list, 10)
     page = request.GET.get('page')
