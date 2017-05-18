@@ -61,8 +61,10 @@ def flowList(request):
 
     flowObj_list  = Flow.objects.all()
     groupObj_list = TagGroup.objects.all()
+    page_title    = u'Рубрики'
 
     return render(request, 'pages/flowList.html', {
         'flowObj_list' : flowObj_list,
         'groupObj_list': groupObj_list,
+        'page_title'   : page_title,
     })
