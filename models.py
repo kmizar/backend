@@ -57,7 +57,7 @@ class Article(models.Model):
     ''' Статья '''
 
     author = models.ForeignKey('auth.User')
-    title  = models.CharField(max_length=200, blank=False)
+    title  = models.CharField(max_length=200, blank=False, unique=True)
     text   = RichTextUploadingField()
 
     created_date   = models.DateTimeField(default=timezone.now)
