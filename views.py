@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Article, Flow, Tag, TagGroup
 
 
-def postList(request, flow=None, tag=None, group=None):
+def postList(request, flow=None, tag=None, group=None, group_tag=None):
     ''' Логика страницы со списком статей '''
 
     if flow:
@@ -21,6 +21,11 @@ def postList(request, flow=None, tag=None, group=None):
     elif group:
         query_list = Article.objects.filter(group__sys_name=group)
         page_title = TagGroup.objects.get(sys_name = group).name
+
+    elif group_tag:
+        filterList = group_tag.split('-')
+        query_list = Article.objects.filter(group__sys_name=filterList[0], tags__sys_name=filterList[1])
+        page_title = u'Последние статьи'
 
     else:
         query_list = Article.objects.all()
