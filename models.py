@@ -31,7 +31,7 @@ class TagGroup(models.Model):
     ''' Группировка тегов '''
 
     name = models.CharField(max_length=100, unique=True, blank=False)
-    icon = ResizedImageField(size=[280,190], upload_to='tag_group_icons/',null=True)
+    icon = ResizedImageField(size=[560,380], upload_to='tag_group_icons/',null=True)
     sys_name    = models.CharField(max_length=100, unique=True, blank=False)
     description = models.CharField(max_length=250, null=True)
 
