@@ -34,7 +34,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
     #filter non-publisher articles and sort data by date publish
     query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
 
-    paginator = Paginator(query_list, 10)
+    paginator = Paginator(query_list, 15)
     page = request.GET.get('page')
 
     try:
@@ -44,7 +44,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
     except EmptyPage:
         postObj_list = paginator.page(paginator.num_pages)
 
-    return render(request, 'pages/postList.html', {
+    return render(request, 'pages/cards.html', {
         'postObj_list': postObj_list,
         'page_title'  : page_title,
     })
@@ -56,7 +56,7 @@ def postArticle(request, post=None):
     postObj = get_object_or_404(Article, pk=post)
     if not postObj.published_date: raise Http404()
 
-    return render(request, 'pages/postArticle.html', {
+    return render(request, 'pages/post.html', {
         'postObj': postObj,
     })
 
@@ -68,7 +68,7 @@ def flowList(request):
     groupObj_list = TagGroup.objects.all()
     page_title    = u'Рубрики'
 
-    return render(request, 'pages/flowList.html', {
+    return render(request, 'pages/hubs.html', {
         'flowObj_list' : flowObj_list,
         'groupObj_list': groupObj_list,
         'page_title'   : page_title,

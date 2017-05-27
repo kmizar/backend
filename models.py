@@ -16,6 +16,20 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django_resized import ResizedImageField
 
 
+#-----------------------------------------------
+#Instance
+import os, datetime
+
+def get_image_path(instance, filename):
+    year  = datetime.datetime.now().strftime('%Y')
+    month = datetime.datetime.now().strftime('%m')
+    day   = datetime.datetime.now().strftime('%d')
+
+    return os.path.join('uploads', year, month, day, filename)
+
+
+#-----------------------------------------------
+#Tables
 class Tag(models.Model):
     ''' Теги статьи '''
 
@@ -58,6 +72,7 @@ class Article(models.Model):
 
     author = models.ForeignKey('auth.User')
     title  = models.CharField(max_length=200, blank=False, unique=True)
+    image  = ResizedImageField(size=[1080,720], upload_to=get_image_path,null=True)
     text   = RichTextUploadingField()
 
     created_date   = models.DateTimeField(default=timezone.now)
@@ -88,3 +103,7 @@ def lower_case(sender, instance, **kwargs):
 @receiver(pre_delete, sender=TagGroup)
 def remove_img(sender, instance, **kwargs):
     instance.icon.delete(False)
+
+@receiver(pre_delete, sender=Article)
+def remove_img(sender, instance, **kwargs):
+    instance.image.delete(False)
