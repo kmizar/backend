@@ -12,20 +12,22 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
 
     if flow:
         query_list = Article.objects.filter(flow__sys_name=flow)
-        page_title = Flow.objects.get(sys_name = flow).name
+        page_title = str(Flow.objects.get(sys_name = flow).name).title()
 
     elif tag:
         query_list = Article.objects.filter(tags__sys_name=tag)
-        page_title = Tag.objects.get(sys_name = tag).name
+        page_title = str(Tag.objects.get(sys_name = tag).name).title()
 
     elif group:
         query_list = Article.objects.filter(group__sys_name=group)
-        page_title = TagGroup.objects.get(sys_name = group).name
+        page_title = str(TagGroup.objects.get(sys_name = group).name).title()
 
     elif group_tag:
         filterList = group_tag.split('-')
         query_list = Article.objects.filter(group__sys_name=filterList[0], tags__sys_name=filterList[1])
-        page_title = u'Последние статьи'
+        page_title = u'{} | {}'.format(
+            str(TagGroup.objects.get(sys_name = filterList[0]).name).title(),
+            str(Tag.objects.get(sys_name = filterList[1]).name).title())
 
     else:
         query_list = Article.objects.all()
@@ -46,7 +48,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
 
     return render(request, 'pages/cards.html', {
         'postObj_list': postObj_list,
-        'page_title'  : page_title,
+        'page_title'  : u'{} | {}'.format(page_title, 'kmizar.com'),
     })
 
 
@@ -66,7 +68,7 @@ def flowList(request):
 
     flowObj_list  = Flow.objects.all()
     groupObj_list = TagGroup.objects.all()
-    page_title    = u'Рубрики'
+    page_title    = u'Рубрики о ремонте и дизайне'
 
     return render(request, 'pages/hubs.html', {
         'flowObj_list' : flowObj_list,
