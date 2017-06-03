@@ -33,7 +33,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
         page_title = str(Tag.objects.get(sys_name = tag).name).title()
 
     elif group:
-        cache_key = 'group_{}'.fromat(group)
+        cache_key = 'group_{}'.format(group)
         cache_time = 60*60*10
         query_list = cache.get(cache_key)
         if not query_list:
