@@ -13,12 +13,18 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
     ''' Логика страницы со списком статей '''
 
     if flow:
-        query_list = Article.objects.filter(flow__sys_name=flow)
+        cache_key = 'flows_{}'.format(flow)
+        cache_time = 60*60*10
+        query_list = cache.get(cache_key)
+        if not query_list:
+            query_list = Article.objects.filter(flow__sys_name=flow)
+            cache.set(cache_key, query_list, cache_time)
+
         page_title = str(Flow.objects.get(sys_name = flow).name).title()
 
     elif tag:
-        cache_key = 'my_heavy_view_cache_key'
-        cache_time = 1800
+        cache_key = 'tag_{}'.fromat(tag)
+        cache_time = 60*60*10
         query_list = cache.get(cache_key)
         if not query_list:
             query_list = Article.objects.filter(tags__sys_name=tag)
@@ -27,7 +33,13 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
         page_title = str(Tag.objects.get(sys_name = tag).name).title()
 
     elif group:
-        query_list = Article.objects.filter(group__sys_name=group)
+        cache_key = 'group_{}'.fromat(group)
+        cache_time = 60*60*10
+        query_list = cache.get(cache_key)
+        if not query_list:
+            query_list = Article.objects.filter(group__sys_name=group)
+            cache.set(cache_key, query_list, cache_time)
+
         page_title = str(TagGroup.objects.get(sys_name = group).name).title()
 
     elif group_tag:
@@ -38,7 +50,13 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             str(Tag.objects.get(sys_name = filterList[1]).name).title())
 
     else:
-        query_list = Article.objects.all()
+        cache_key = 'all_articles'
+        cache_time = 60*60*10
+        query_list = cache.get(cache_key)
+        if not query_list:
+            query_list = Article.objects.all()
+            cache.set(cache_key, query_list, cache_time)
+
         page_title = u'Последние статьи'
 
     #filter non-publisher articles and sort data by date publish
