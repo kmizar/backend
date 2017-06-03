@@ -13,7 +13,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
     ''' Логика страницы со списком статей '''
 
     if flow:
-        cache_key = 'flows_{}'.format(flow)
+        cache_key = 'flows_{}'.format(str(flow))
         cache_time = 60*60*10
         query_list = cache.get(cache_key)
         if not query_list:
@@ -23,7 +23,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
         page_title = str(Flow.objects.get(sys_name = flow).name).title()
 
     elif tag:
-        cache_key = 'tag_{}'.fromat(tag)
+        cache_key = 'tag_{}'.fromat(str(tag))
         cache_time = 60*60*10
         query_list = cache.get(cache_key)
         if not query_list:
@@ -33,7 +33,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
         page_title = str(Tag.objects.get(sys_name = tag).name).title()
 
     elif group:
-        cache_key = 'group_{}'.fromat(group)
+        cache_key = 'group_{}'.fromat(str(group))
         cache_time = 60*60*10
         query_list = cache.get(cache_key)
         if not query_list:
