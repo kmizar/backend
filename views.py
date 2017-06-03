@@ -6,6 +6,8 @@ from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Article, Flow, Tag, TagGroup
 
+from django.core.cache import cache
+
 
 def postList(request, flow=None, tag=None, group=None, group_tag=None):
     ''' Логика страницы со списком статей '''
@@ -15,7 +17,13 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
         page_title = str(Flow.objects.get(sys_name = flow).name).title()
 
     elif tag:
-        query_list = Article.objects.filter(tags__sys_name=tag)
+        cache_key = 'my_heavy_view_cache_key'
+        cache_time = 1800
+        query_list = cache.get(cache_key)
+        if not query_list:
+            query_list = Article.objects.filter(tags__sys_name=tag)
+            cache.set(cache_key, query_list, cache_time)
+
         page_title = str(Tag.objects.get(sys_name = tag).name).title()
 
     elif group:
