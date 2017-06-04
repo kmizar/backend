@@ -1,46 +1,69 @@
 # -*- coding: utf-8 -*-
+#system
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.http import Http404
 
+#paginator
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+#database
 from .models import Article, Flow, Tag, TagGroup
-
+#memcached: python-memcached, yum -y install memcached
 from django.core.cache import cache
 
 
+#--------------------------------------------------------
+#Const
+cacheTime = 60*60*10
+carsCount = 15
+
+
+#--------------------------------------------------------
+#Funcs
 def postList(request, flow=None, tag=None, group=None, group_tag=None):
     ''' Логика страницы со списком статей '''
 
     if flow:
-        cache_key = 'flows_{}'.format(flow)
-        cache_time = 60*60*10
+        cache_key  = 'flows_{}'.format(flow)
         query_list = cache.get(cache_key)
         if not query_list:
             query_list = Article.objects.filter(flow__sys_name=flow)
-            cache.set(cache_key, query_list, cache_time)
+            cache.set(cache_key, query_list, cacheTime)
 
-        page_title = str(Flow.objects.get(sys_name = flow).name).title()
+        cache_key  = 'title_{}'.format(flow)
+        page_title = cache.get(cache_key)
+        if not page_title:
+            page_title = str(Flow.objects.get(sys_name = flow).name).title()
+            cache.set(cache_key, query_list, cacheTime)
+
 
     elif tag:
         cache_key = 'tag_{}'.format(tag)
-        cache_time = 60*60*10
         query_list = cache.get(cache_key)
         if not query_list:
             query_list = Article.objects.filter(tags__sys_name=tag)
-            cache.set(cache_key, query_list, cache_time)
+            cache.set(cache_key, query_list, cacheTime)
 
-        page_title = str(Tag.objects.get(sys_name = tag).name).title()
+        cache_key  = 'title_{}'.format(tag)
+        page_title = cache.get(cache_key)
+        if not page_title:
+            page_title = str(Tag.objects.get(sys_name = tag).name).title()
+            cache.set(cache_key, query_list, cacheTime)
+
 
     elif group:
         cache_key = 'group_{}'.format(group)
-        cache_time = 60*60*10
         query_list = cache.get(cache_key)
         if not query_list:
             query_list = Article.objects.filter(group__sys_name=group)
-            cache.set(cache_key, query_list, cache_time)
+            cache.set(cache_key, query_list, cacheTime)
 
-        page_title = str(TagGroup.objects.get(sys_name = group).name).title()
+        cache_key  = 'title_{}'.format(group)
+        page_title = cache.get(cache_key)
+        if not page_title:
+            page_title = str(TagGroup.objects.get(sys_name = group).name).title()
+            cache.set(cache_key, query_list, cacheTime)
+
 
     elif group_tag:
         filterList = group_tag.split('-')
@@ -49,20 +72,22 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             str(TagGroup.objects.get(sys_name = filterList[0]).name).title(),
             str(Tag.objects.get(sys_name = filterList[1]).name).title())
 
+
     else:
         cache_key = 'all_articles'
-        cache_time = 60*60*10
         query_list = cache.get(cache_key)
         if not query_list:
             query_list = Article.objects.all()
-            cache.set(cache_key, query_list, cache_time)
+            cache.set(cache_key, query_list, cacheTime)
 
         page_title = u'Последние статьи'
+
 
     #filter non-publisher articles and sort data by date publish
     query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
 
-    paginator = Paginator(query_list, 15)
+    #create paginator object
+    paginator = Paginator(query_list, carsCount)
     page = request.GET.get('page')
 
     try:
@@ -74,7 +99,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
 
     return render(request, 'pages/cards.html', {
         'postObj_list': postObj_list,
-        'page_title'  : u'{} | {}'.format(page_title, 'kmizar.com'),
+        'page_title'  : page_title,
     })
 
 
@@ -92,8 +117,18 @@ def postArticle(request, post=None):
 def flowList(request):
     ''' Логика страницы со списком тегов и рубрик '''
 
-    flowObj_list  = Flow.objects.all()
-    groupObj_list = TagGroup.objects.all()
+    cache_key    = 'flowObj_list'
+    flowObj_list = cache.get(cache_key)
+    if not flowObj_list:
+        flowObj_list  = Flow.objects.all()
+        cache.set(cache_key, query_list, cacheTime)
+
+    cache_key     = 'groupObj_list'
+    groupObj_list = cache.get(cache_key)
+    if not groupObj_list:
+        groupObj_list = TagGroup.objects.all()
+        cache.set(cache_key, query_list, cacheTime)
+
     page_title    = u'Рубрики о ремонте и дизайне'
 
     return render(request, 'pages/hubs.html', {
