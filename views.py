@@ -109,13 +109,13 @@ def flowList(request):
     flowObj_list = cache.get(cache_key)
     if not flowObj_list:
         flowObj_list  = Flow.objects.all()
-        cache.set(cache_key, query_list, cacheTime)
+        cache.set(cache_key, flowObj_list, cacheTime)
 
     cache_key     = 'groupObj_list'
     groupObj_list = cache.get(cache_key)
     if not groupObj_list:
         groupObj_list = TagGroup.objects.all()
-        cache.set(cache_key, query_list, cacheTime)
+        cache.set(cache_key, groupObj_list, cacheTime)
 
     page_title    = u'Рубрики о ремонте и дизайне'
 
