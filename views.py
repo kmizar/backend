@@ -30,11 +30,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             query_list = Article.objects.filter(flow__sys_name=flow)
             cache.set(cache_key, query_list, cacheTime)
 
-        cache_key  = 'title_{}'.format(flow)
-        page_title = cache.get(cache_key)
-        if not page_title:
-            page_title = str(Flow.objects.get(sys_name = flow).name).title()
-            cache.set(cache_key, query_list, cacheTime)
+        page_title = str(Flow.objects.get(sys_name = flow).name).title()
 
 
     elif tag:
@@ -44,11 +40,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             query_list = Article.objects.filter(tags__sys_name=tag)
             cache.set(cache_key, query_list, cacheTime)
 
-        cache_key  = 'title_{}'.format(tag)
-        page_title = cache.get(cache_key)
-        if not page_title:
-            page_title = str(Tag.objects.get(sys_name = tag).name).title()
-            cache.set(cache_key, query_list, cacheTime)
+        page_title = str(Tag.objects.get(sys_name = tag).name).title()
 
 
     elif group:
@@ -58,11 +50,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             query_list = Article.objects.filter(group__sys_name=group)
             cache.set(cache_key, query_list, cacheTime)
 
-        cache_key  = 'title_{}'.format(group)
-        page_title = cache.get(cache_key)
-        if not page_title:
-            page_title = str(TagGroup.objects.get(sys_name = group).name).title()
-            cache.set(cache_key, query_list, cacheTime)
+        page_title = str(TagGroup.objects.get(sys_name = group).name).title()
 
 
     elif group_tag:
