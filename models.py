@@ -38,7 +38,7 @@ class Tag(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
 
     def  __str__(self):
-        return self.sys_name
+        return self.name
 
 
 class TagGroup(models.Model):
@@ -53,7 +53,7 @@ class TagGroup(models.Model):
     tags = models.ManyToManyField(Tag, blank=True)
 
     def __str__(self):
-        return self.sys_name
+        return self.name
 
 
 class Flow(models.Model):
@@ -64,7 +64,7 @@ class Flow(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.sys_name
+        return self.name
 
 
 class Article(models.Model):
