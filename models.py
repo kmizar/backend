@@ -76,7 +76,7 @@ class Article(models.Model):
     text   = RichTextUploadingField()
 
     meta_title       = models.CharField(max_length=150,  unique=False, blank=True)
-    meta_description = models.TextField()
+    meta_description = models.TextField(max_length=250, unique=False, blank=True)
     meta_keywords    = models.CharField(max_length=250, unique=False, blank=True)
 
     created_date   = models.DateTimeField(default=timezone.now)
