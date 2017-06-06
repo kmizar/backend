@@ -12,7 +12,7 @@ urlpatterns = [
     url(r'^groups-tags/(?P<group_tag>[a-z0-9_-]+)/$',  views.postList),
 
     #Список рубрик и тегов
-    url(r'^flows/$', views.flowList),
+    url(r'^flows/$', views.flowList, name='flow'),
 
     #Статья
     url(r'^post/(?P<post>\d+)/$', views.postArticle),
