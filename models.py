@@ -100,9 +100,14 @@ class Article(models.Model):
 @receiver(pre_save, sender=Flow)
 @receiver(pre_save, sender=Tag)
 @receiver(pre_save, sender=TagGroup)
-def lower_case(sender, instance, **kwargs):
-    instance.name     = instance.name.lower()
+def strings_formated(sender, instance, **kwargs):
+    instance.name     = instance.name.capitalize()
     instance.sys_name = instance.sys_name.lower()
+    
+@receiver(pre_save, sender=Article)
+def capitalize_headers(sender, instance, **kwargs):
+    instance.title      = instance.title.capitalize()
+    instance.meta_title = instance.meta_title.capitalize()
 
 @receiver(pre_delete, sender=TagGroup)
 def remove_img(sender, instance, **kwargs):
