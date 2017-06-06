@@ -21,7 +21,7 @@ class PostSitemap(Sitemap):
 
 #All flows
 #not used because its filter
-class FlowSitemap(Sitemap):
+class FlowsSitemap(Sitemap):
     changefreq = 'daily'
     priority   = 0.8
 
@@ -37,7 +37,7 @@ class FlowSitemap(Sitemap):
 
 #All groups
 #not used because its filter
-class GroupSitemap(Sitemap):
+class GroupsSitemap(Sitemap):
     changefreq = 'daily'
     priority   = 0.8
 
@@ -60,5 +60,17 @@ class HomeSitemap(Sitemap):
     def items(self):
         return self.pages
 
+    def location(self, item):
+        return reverse(item)
+        
+#Hubs page
+class FlowSitemap(Sitemap):
+    priority   = 1
+    changefreq = 'daily'
+    pages      = ['flow']
+    
+    def items(self):
+        return self.pages
+        
     def location(self, item):
         return reverse(item)
