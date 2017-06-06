@@ -20,6 +20,7 @@ class PostSitemap(Sitemap):
 
 
 #All flows
+#not used because its filter
 class FlowSitemap(Sitemap):
     changefreq = 'daily'
     priority   = 0.8
@@ -35,6 +36,7 @@ class FlowSitemap(Sitemap):
 
 
 #All groups
+#not used because its filter
 class GroupSitemap(Sitemap):
     changefreq = 'daily'
     priority   = 0.8
