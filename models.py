@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+import subprocess
+
 from django.db import models
 from django.utils import timezone
 
 #DataBase hooks
+from django.db.models.signals import post_save
 from django.db.models.signals import pre_delete
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -108,6 +111,11 @@ def strings_formated(sender, instance, **kwargs):
 def capitalize_headers(sender, instance, **kwargs):
     instance.title      = instance.title.capitalize()
     instance.meta_title = instance.meta_title.capitalize()
+    
+@receiver(post_save, sender=Article)
+def reset_cacheBackend(sender, **kwargs):
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https'
+    console = subprocess.Popen(cmd, shell=True)
 
 @receiver(pre_delete, sender=TagGroup)
 def remove_img(sender, instance, **kwargs):
