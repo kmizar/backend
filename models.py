@@ -5,9 +5,8 @@ from django.db import models
 from django.utils import timezone
 
 #DataBase hooks
-from django.db.models.signals import post_save
-from django.db.models.signals import pre_delete
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_delete, pre_delete
 from django.dispatch import receiver
 
 #RichTextEditor
@@ -99,7 +98,7 @@ class Article(models.Model):
 
 
 #-----------------------------------------------
-#Hooks
+#Common Hooks
 @receiver(pre_save, sender=Flow)
 @receiver(pre_save, sender=Tag)
 @receiver(pre_save, sender=TagGroup)
@@ -112,11 +111,6 @@ def capitalize_headers(sender, instance, **kwargs):
     instance.title      = instance.title.capitalize()
     instance.meta_title = instance.meta_title.capitalize()
     
-@receiver(post_save, sender=Article)
-def reset_cacheBackend(sender, **kwargs):
-    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https'
-    console = subprocess.Popen(cmd, shell=True)
-
 @receiver(pre_delete, sender=TagGroup)
 def remove_img(sender, instance, **kwargs):
     instance.icon.delete(False)
@@ -124,3 +118,18 @@ def remove_img(sender, instance, **kwargs):
 @receiver(pre_delete, sender=Article)
 def remove_img(sender, instance, **kwargs):
     instance.image.delete(False)
+
+#Cache hooks
+@receiver(post_save,   sender=Article)
+@receiver(post_delete, sender=Article)
+def reset_articleCache(sender, instance, **kwargs):
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https'
+    console = subprocess.Popen(cmd, shell=True)
+    
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/post/{}'.format(instance.id)
+    console = subprocess.Popen(cmd, shell=True)
+    
+@receiver(post_save, sender=TagGroup)
+def reset_TagGroupCache(sender, instance, **kwargs):
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows'
+    console = subprocess.Popen(cmd, shell=True)
