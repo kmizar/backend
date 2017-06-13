@@ -6,7 +6,7 @@ from django.utils import timezone
 
 #DataBase hooks
 from django.db.models.signals import pre_save, post_save
-from django.db.models.signals import pre_delete, pre_delete
+from django.db.models.signals import pre_delete, post_delete
 from django.dispatch import receiver
 
 #RichTextEditor
