@@ -131,6 +131,23 @@ def reset_articleCache(sender, instance, **kwargs):
     
 @receiver(post_save,   sender=TagGroup)
 @receiver(post_delete, sender=TagGroup)
-def reset_TagGroupCache(sender, instance, **kwargs):
+def reset_tagGroupCache(sender, instance, **kwargs):
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows/'
     console = subprocess.Popen(cmd, shell=True)
+    
+@receiver(post_save, sender=Flow)
+@receiver(post_delete, sender=Flow)
+def reset_senderFlow(sender, instance, **kwargs):
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https'
+    console = subprocess.Popen(cmd, shell=True)
+    
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows/'
+    console = subprocess.Popen(cmd, shell=True)
+    
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows/{}/'.format(instance.sys_name)
+    console = subprocess.Popen(cmd, shell=True)
+    
+    posts = Article.objects.filter(flow__sys_name=instance.sys_name)
+    for post in posts:
+        cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/post/{}/'.format(post.id)
+        console = subprocess.Popen(cmd, shell=True)
