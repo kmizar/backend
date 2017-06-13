@@ -126,10 +126,11 @@ def reset_articleCache(sender, instance, **kwargs):
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https'
     console = subprocess.Popen(cmd, shell=True)
     
-    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/post/{}'.format(instance.id)
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/post/{}/'.format(instance.id)
     console = subprocess.Popen(cmd, shell=True)
     
-@receiver(post_save, sender=TagGroup)
+@receiver(post_save,   sender=TagGroup)
+@receiver(post_delete, sender=TagGroup)
 def reset_TagGroupCache(sender, instance, **kwargs):
-    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows'
+    cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows/'
     console = subprocess.Popen(cmd, shell=True)
