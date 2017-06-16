@@ -117,10 +117,7 @@ def flowList(request):
         groupObj_list = TagGroup.objects.all()
         cache.set(cache_key, groupObj_list, cacheTime)
 
-    page_title    = u'Рубрики о ремонте и дизайне'
-
     return render(request, 'pages/hubs.html', {
         'flowObj_list' : flowObj_list,
         'groupObj_list': groupObj_list,
-        'page_title'   : page_title,
     })
