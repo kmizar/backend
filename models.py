@@ -64,6 +64,7 @@ class Flow(models.Model):
     name = models.CharField(max_length=100, unique=True, blank=False)
     sys_name     = models.CharField(max_length=100, unique=True, blank=False)
     created_date = models.DateTimeField(default=timezone.now)
+    color = models.CharField(max_length=7, unique=False, blank=True)
 
     def __str__(self):
         return self.name
