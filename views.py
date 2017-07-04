@@ -94,8 +94,13 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
 def postArticle(request, post=None):
     ''' Логика страницы с открытой статьей '''
 
+    from backend.services.recoman.recoman import Recoman
+
     postObj = get_object_or_404(Article, pk=post)
     if not postObj.published_date: raise Http404()
+
+    #recoman for article recommendation
+    recoDumper = Recoman(postObj)
 
     return render(request, 'pages/post.html', {
         'postObj': postObj,
