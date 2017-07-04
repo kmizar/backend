@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+from backend.models import Article, Flow, TagGroup
+import random
 
 
 #-----------------------------------------------------------------------------------
@@ -9,4 +10,6 @@ class Recoman(object):
         self.postObj = _postObj
 
     def getData(self):
-        return [self.postObj, self.postObj, self.postObj, self.postObj]
+        ran = random.randint(1,2)
+        return [Article.objects.get(id=ran),Article.objects.get(id=ran),Article.objects.get(id=ran),
+        Article.objects.get(id=ran),Article.objects.get(id=ran),Article.objects.get(id=ran)]
