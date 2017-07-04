@@ -107,9 +107,12 @@ def postArticle(request, post=None):
     #recoman for article recommendation
     if recoman_check:
         recoDumper = Recoman(postObj)
+    else:
+        recoDumper = False
 
     return render(request, 'pages/post.html', {
         'postObj': postObj,
+        'recoDumper': recoDumper,
     })
 
 
