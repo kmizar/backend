@@ -9,4 +9,4 @@ class Recoman(object):
         self.postObj = _postObj
 
     def getData(self):
-        return self.postObj
+        return [self.postObj, self.postObj, self.postObj, self.postObj]
