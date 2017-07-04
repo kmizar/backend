@@ -107,12 +107,13 @@ def postArticle(request, post=None):
     #recoman for article recommendation
     if recoman_check:
         recoDumper = Recoman(postObj)
+        recoObj_list = recoDumper.getData()
     else:
-        recoDumper = False
+        recoObj_list = False
 
     return render(request, 'pages/post.html', {
         'postObj': postObj,
-        'recoDumper': recoDumper,
+        'recoObj_list': recoObj_list,
     })
 
 
