@@ -19,16 +19,17 @@ class Recoman(object):
             ).exclude(id=self.postObj.id).distinct().order_by('-id')[:3]
 
             for data in articles:
-                recoData.append(data)
+                if data not in recoData:
+                    recoData.append(data)
 
             if len(recoData) > 2:
                 return recoData
 
-            tagsList = tagsList.filter(id=tagsList[len(tagsList)-1].id).delete()
+            tagsList = tagsList.exclude(id=tagsList[len(tagsList)-1].id)
 
 
-        #else:
-        return recoData
+        else:
+            return recoData
 
 
 
