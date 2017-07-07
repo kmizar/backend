@@ -104,10 +104,10 @@ def postArticle(request, post=None):
     except ImportError:
         recoman_check = False
 
-    #recoman for article recommendation
+    #start recoman
     if recoman_check:
         recoDumper = Recoman(postObj)
-        recoObj_list = recoDumper.getData()
+        recoObj_list = recoDumper.getRecoData()
     else:
         recoObj_list = False
 
