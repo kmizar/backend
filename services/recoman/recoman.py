@@ -31,6 +31,8 @@ class Recoman(object):
             Формируеи рекомендации, делая запросы в БД исходя из списка
             тегов (список статей из БД получаем в случайной сортировке),
             ограничиваем максимальную длин рекомендация: 4
+
+            В блоке try/except исключаем из рекомендация дубликаты и тек. статью
         '''
 
         tagCombinationList = self.getTagCombinationList()
@@ -40,10 +42,12 @@ class Recoman(object):
             if len(recoArticlesList) > 4:
                 break
             else:
-                recoArticlesList.append(
-                    Article.objects.filter(
-                        tags__in=tagsGroup
-                    ).order_by('?')[1]
-                )
+                try:
+                    recoArticlesList.append(
+                        Article.objects.filter(
+                            tags__in=tagsGroup
+                        ).exclude(id=self.postObj.id).exclude(id__in=[x.id for x in recoArticlesList]).order_by('?')[1]
+                    )
+                except: pass
 
         return recoArticlesList
