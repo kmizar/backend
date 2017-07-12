@@ -97,6 +97,10 @@ def postArticle(request, post=None):
     postObj = get_object_or_404(Article, pk=post)
     if not postObj.published_date: raise Http404()
 
+    #increment article_count
+    postObj.article_count += 1
+    postObj.save()
+
     #include recoman module
     try:
         from backend.services.recoman.recoman import Recoman

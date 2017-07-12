@@ -17,7 +17,6 @@ from ckeditor_uploader.fields import RichTextUploadingField
 #Info: github.com/un1t/django-resized
 from django_resized import ResizedImageField
 
-
 #-----------------------------------------------
 #Instance
 import os, datetime
@@ -84,6 +83,7 @@ class Article(models.Model):
 
     created_date   = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
+    article_count  = models.PositiveIntegerField(default=0)
 
     #Связи с темой и тегами статьи
     flow  = models.ForeignKey(Flow, blank=False, on_delete=models.CASCADE)
@@ -97,7 +97,6 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
-
 #-----------------------------------------------
 #Common Hooks
 @receiver(pre_save, sender=Flow)
@@ -106,12 +105,12 @@ class Article(models.Model):
 def strings_formated(sender, instance, **kwargs):
     instance.name     = instance.name.capitalize()
     instance.sys_name = instance.sys_name.lower()
-    
+
 @receiver(pre_save, sender=Article)
 def capitalize_headers(sender, instance, **kwargs):
     instance.title      = instance.title.capitalize()
     instance.meta_title = instance.meta_title.capitalize()
-    
+
 @receiver(pre_delete, sender=TagGroup)
 def remove_img(sender, instance, **kwargs):
     instance.icon.delete(False)
@@ -126,45 +125,45 @@ def remove_img(sender, instance, **kwargs):
 def reset_articleCache(sender, instance, **kwargs):
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https'
     console = subprocess.Popen(cmd, shell=True)
-    
+
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/post/{}/'.format(instance.id)
     console = subprocess.Popen(cmd, shell=True)
-    
+
 @receiver(post_save,   sender=TagGroup)
 @receiver(post_delete, sender=TagGroup)
 def reset_tagGroupCache(sender, instance, **kwargs):
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows/'
     console = subprocess.Popen(cmd, shell=True)
-    
+
 @receiver(post_save, sender=Flow)
 @receiver(post_delete, sender=Flow)
 def reset_flowCache(sender, instance, **kwargs):
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https'
     console = subprocess.Popen(cmd, shell=True)
-    
+
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows/'
     console = subprocess.Popen(cmd, shell=True)
-    
+
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows/{}/'.format(instance.sys_name)
     console = subprocess.Popen(cmd, shell=True)
-    
+
     posts = Article.objects.filter(flow__sys_name=instance.sys_name)
     for post in posts:
         cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/post/{}/'.format(post.id)
         console = subprocess.Popen(cmd, shell=True)
-        
+
 @receiver(post_save, sender=Tag)
 @receiver(post_delete, sender=Tag)
 def reset_tagCache(sender, instance, **kwargs):
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https'
     console = subprocess.Popen(cmd, shell=True)
-    
+
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/flows/'
     console = subprocess.Popen(cmd, shell=True)
-    
+
     cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/tags/{}/'.format(instance.sys_name)
     console = subprocess.Popen(cmd, shell=True)
-    
+
     posts = Article.objects.filter(tags__sys_name=instance.sys_name)
     for post in posts:
         cmd = 'curl -s -o /dev/null  -H "X-Update: 1" https/post/{}/'.format(post.id)
