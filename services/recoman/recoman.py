@@ -1,31 +1,49 @@
 # -*- coding: utf-8 -*-
 from backend.models import Article, Flow, TagGroup
-import random
-
 
 #-----------------------------------------------------------------------------------
 #class
 class Recoman(object):
     def __init__(self, _postObj):
-        self.postObj = _postObj
+        self.postObj  = _postObj
+        self.tagsList = _postObj.tags.all()
+
+    def getTagCombinationList(self):
+        '''
+            Фомируем список возможных комбинаций тегов,
+            с максимальной длиной в 2 элемента, возвращаем отсортированный
+            список по длине.
+        '''
+
+        combinationList = []
+        for item in range(0, len(self.tagsList)):
+            combinationList.append([ self.tagsList[item] ])
+            for i in range(0, item):
+                combinationList.append([
+                    self.tagsList[item],
+                    self.tagsList[i]
+                ])
+
+        return sorted(combinationList,key=len,reverse=True)
 
     def getRecoData(self):
-        tagsList = self.postObj.tags.all()
-        recoData = []
+        '''
+            Формируеи рекомендации, делая запросы в БД исходя из списка
+            тегов (список статей из БД получаем в случайной сортировке),
+            ограничиваем максимальную длин рекомендация: 4
+        '''
 
-        while len(tagsList) > 0:
-            articles = Article.objects.filter(
-                tags__in=self.postObj.tags.all()
-            ).exclude(id=self.postObj.id).distinct().order_by('-id')[:3]
+        tagCombinationList = self.getTagCombinationList()
 
-            for data in articles:
-                if data not in recoData:
-                    recoData.append(data)
+        recoArticlesList = []
+        for tagsGroup in tagCombinationList:
+            if len(recoArticlesList) > 4:
+                break
+            else:
+                recoArticlesList.append(
+                    Article.objects.filter(
+                        tags__in=tagsGroup
+                    ).order_by('?')[1]
+                )
 
-            if len(recoData) > 2:
-                return recoData
-
-            tagsList = tagsList.exclude(id=tagsList[len(tagsList)-1].id)
-
-        else:
-            return recoData
+        return recoArticlesList

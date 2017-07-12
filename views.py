@@ -100,15 +100,10 @@ def postArticle(request, post=None):
     #include recoman module
     try:
         from backend.services.recoman.recoman import Recoman
-        recoman_check = True
-    except ImportError:
-        recoman_check = False
-
-    #start recoman
-    if recoman_check:
         recoDumper = Recoman(postObj)
         recoObj_list = recoDumper.getRecoData()
-    else:
+
+    except ImportError:
         recoObj_list = False
 
     return render(request, 'pages/post.html', {
