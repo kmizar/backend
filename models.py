@@ -81,9 +81,9 @@ class Article(models.Model):
     meta_description = models.TextField(max_length=160,  unique=False, blank=True)
     meta_keywords    = models.TextField(max_length=150,  unique=False, blank=True)
 
-    created_date   = models.DateTimeField(default=timezone.now)
-    published_date = models.DateTimeField(blank=True, null=True)
-    article_count  = models.PositiveIntegerField(default=0)
+    created_date     = models.DateTimeField(default=timezone.now)
+    published_date   = models.DateTimeField(blank=True, null=True)
+    article_count    = models.PositiveIntegerField(default=0)
 
     #Связи с темой и тегами статьи
     flow  = models.ForeignKey(Flow, blank=False, on_delete=models.CASCADE)

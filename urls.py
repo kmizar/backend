@@ -13,7 +13,7 @@ urlpatterns = [
 
     #Страница - ничего не найдено
     url(r'^not_found/$', views.notFound),
-    
+
     #Поиск по тегам, валидация формы
     url(r'^tags/$',  views.tagsSearcher),
 
