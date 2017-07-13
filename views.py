@@ -15,8 +15,8 @@ from django.core.cache import cache
 
 #--------------------------------------------------------
 #Const
-cacheTime = 60*60*10
-carsCount = 15
+cacheTime  = 60*60*10
+cardsCount = 15
 
 
 #--------------------------------------------------------
@@ -89,12 +89,11 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             query_list = Article.objects.all()
             cache.set(cache_key, query_list, cacheTime)
 
-
     #Фильтруем неопубликованные статьи и сортируем по дате публикации
     query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
 
     #Пагинатор
-    paginator = Paginator(query_list, carsCount)
+    paginator = Paginator(query_list, cardsCount)
     page = request.GET.get('page')
 
     try:
@@ -116,14 +115,14 @@ def postArticle(request, post=None):
     postObj = get_object_or_404(Article, pk=post)
     if not postObj.published_date: raise Http404()
 
-    #increment article_count
+    #Инкрементируем счетчик страницы
     postObj.article_count += 1
     postObj.save()
 
-    #include recoman module
+    #Подключаем модуль с рекомендациями
     try:
         from backend.services.recoman.recoman import Recoman
-        recoDumper = Recoman(postObj)
+        recoDumper   = Recoman(postObj)
         recoObj_list = recoDumper.getRecoData()
 
     except ImportError:
@@ -138,12 +137,14 @@ def postArticle(request, post=None):
 def flowList(request):
     ''' Логика страницы со списком тегов и рубрик '''
 
+    #Достаем потоки(хабы)
     cache_key    = 'flowObj_list'
     flowObj_list = cache.get(cache_key)
     if not flowObj_list:
         flowObj_list  = Flow.objects.all()
         cache.set(cache_key, flowObj_list, cacheTime)
 
+    #Достаем группы тегов
     cache_key     = 'groupObj_list'
     groupObj_list = cache.get(cache_key)
     if not groupObj_list:
@@ -156,9 +157,6 @@ def flowList(request):
     })
 
 
-def notFound(request):
-    return render(request, 'pages/cards.html', {})
-
 def tagsSearcher(request):
     ''' Логика проверки поля ввода + трансформация tagName в tagSysName '''
 
@@ -170,7 +168,12 @@ def tagsSearcher(request):
             tagKey = (Tag.objects.get(name=tagName.capitalize())).sys_name
             return redirect(postList, tag=tagKey)
         except:
-            tagKey = 'not_found'
-            return redirect('/tags/not_found/')
+            return redirect(notFound)
     else:
         raise Http404
+
+
+def notFound(request):
+    ''' Логика обработки пустой страницы с уведомлением not_found '''
+
+    return render(request, 'pages/cards.html', {})
