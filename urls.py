@@ -11,6 +11,9 @@ urlpatterns = [
     url(r'^tags/(?P<tag>[a-z0-9_]+)/$',                views.postList),
     url(r'^groups-tags/(?P<group_tag>[a-z0-9_-]+)/$',  views.postList),
 
+    #Страница - ничего не найдено
+    url(r'^not_found/$', views.notFound),
+    
     #Поиск по тегам, валидация формы
     url(r'^tags/$',  views.tagsSearcher),
 

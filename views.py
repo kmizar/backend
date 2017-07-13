@@ -24,67 +24,76 @@ carsCount = 15
 def postList(request, flow=None, tag=None, group=None, group_tag=None):
     ''' Логика страницы со списком статей '''
 
+    #Фильтр статей по потокам(хабам)
     if flow:
-        cache_key  = 'flows_{}'.format(flow)
-        query_list = cache.get(cache_key)
-        if not query_list:
-            query_list = Article.objects.filter(flow__sys_name=flow)
-            cache.set(cache_key, query_list, cacheTime)
-
         try:
             page_title = str(Flow.objects.get(sys_name = flow).name).title()
-        except: page_title = ''
 
+            cache_key  = 'flows_{}'.format(flow)
+            query_list = cache.get(cache_key)
+            if not query_list:
+                query_list = Article.objects.filter(flow__sys_name=flow)
+                cache.set(cache_key, query_list, cacheTime)
 
+        except:
+            return redirect(notFound)
+
+    #Фильтр статей по тегам
     elif tag:
-        cache_key = 'tag_{}'.format(tag)
-        query_list = cache.get(cache_key)
-        if not query_list:
-            query_list = Article.objects.filter(tags__sys_name=tag)
-            cache.set(cache_key, query_list, cacheTime)
-
         try:
             page_title = str(Tag.objects.get(sys_name = tag).name).title()
-        except: page_title = ''
 
+            cache_key  = 'tag_{}'.format(tag)
+            query_list = cache.get(cache_key)
+            if not query_list:
+                query_list = Article.objects.filter(tags__sys_name=tag)
+                cache.set(cache_key, query_list, cacheTime)
 
+        except:
+            return redirect(notFound)
+
+    #Фильтр статей по группам тегов
     elif group:
-        cache_key = 'group_{}'.format(group)
-        query_list = cache.get(cache_key)
-        if not query_list:
-            query_list = Article.objects.filter(group__sys_name=group)
-            cache.set(cache_key, query_list, cacheTime)
-
         try:
             page_title = str(TagGroup.objects.get(sys_name = group).name).title()
-        except: page_title = ''
 
+            cache_key = 'group_{}'.format(group)
+            query_list = cache.get(cache_key)
+            if not query_list:
+                query_list = Article.objects.filter(group__sys_name=group)
+                cache.set(cache_key, query_list, cacheTime)
 
+        except:
+            return redirect(notFound)
+
+    #Фильтр статей по тагам в группе
     elif group_tag:
-        filterList = group_tag.split('-')
-        query_list = Article.objects.filter(group__sys_name=filterList[0], tags__sys_name=filterList[1])
-
         try:
+            filterList = group_tag.split('-')
             page_title = u'{} | {}'.format(
                 str(TagGroup.objects.get(sys_name = filterList[0]).name).title(),
                 str(Tag.objects.get(sys_name = filterList[1]).name).title())
-        except: page_title = ''
 
+            query_list = Article.objects.filter(group__sys_name=filterList[0], tags__sys_name=filterList[1])
 
+        except:
+            return redirect(notFound)
+
+    #Без фильтра, вываливаем все
     else:
+        page_title = u'Последние статьи'
+
         cache_key = 'all_articles'
         query_list = cache.get(cache_key)
         if not query_list:
             query_list = Article.objects.all()
             cache.set(cache_key, query_list, cacheTime)
 
-        page_title = u'Последние статьи'
 
-
-    #filter non-publisher articles and sort data by date publish
+    #Фильтруем неопубликованные статьи и сортируем по дате публикации
     query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
 
-    #create paginator object
+    #Пагинатор
     paginator = Paginator(query_list, carsCount)
     page = request.GET.get('page')
 
@@ -146,6 +155,9 @@ def flowList(request):
         'groupObj_list': groupObj_list,
     })
 
+
+def notFound(request):
+    return render(request, 'pages/cards.html', {})
 
 def tagsSearcher(request):
     ''' Логика проверки поля ввода + трансформация tagName в tagSysName '''
