@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #system
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.shortcuts import render
 from django.http import Http404
 
@@ -30,7 +31,9 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             query_list = Article.objects.filter(flow__sys_name=flow)
             cache.set(cache_key, query_list, cacheTime)
 
-        page_title = str(Flow.objects.get(sys_name = flow).name).title()
+        try:
+            page_title = str(Flow.objects.get(sys_name = flow).name).title()
+        except: page_title = ''
 
 
     elif tag:
@@ -40,7 +43,9 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             query_list = Article.objects.filter(tags__sys_name=tag)
             cache.set(cache_key, query_list, cacheTime)
 
-        page_title = str(Tag.objects.get(sys_name = tag).name).title()
+        try:
+            page_title = str(Tag.objects.get(sys_name = tag).name).title()
+        except: page_title = ''
 
 
     elif group:
@@ -50,15 +55,20 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             query_list = Article.objects.filter(group__sys_name=group)
             cache.set(cache_key, query_list, cacheTime)
 
-        page_title = str(TagGroup.objects.get(sys_name = group).name).title()
+        try:
+            page_title = str(TagGroup.objects.get(sys_name = group).name).title()
+        except: page_title = ''
 
 
     elif group_tag:
         filterList = group_tag.split('-')
         query_list = Article.objects.filter(group__sys_name=filterList[0], tags__sys_name=filterList[1])
-        page_title = u'{} | {}'.format(
-            str(TagGroup.objects.get(sys_name = filterList[0]).name).title(),
-            str(Tag.objects.get(sys_name = filterList[1]).name).title())
+
+        try:
+            page_title = u'{} | {}'.format(
+                str(TagGroup.objects.get(sys_name = filterList[0]).name).title(),
+                str(Tag.objects.get(sys_name = filterList[1]).name).title())
+        except: page_title = ''
 
 
     else:
@@ -135,3 +145,20 @@ def flowList(request):
         'flowObj_list' : flowObj_list,
         'groupObj_list': groupObj_list,
     })
+
+
+def tagsSearcher(request):
+    ''' Логика проверки поля ввода + трансформация tagName в tagSysName '''
+
+    if request.method == 'POST':
+        tagName = request.POST.get("tag")
+        for e in '!@#$%^&()<>`"/\':;|': tagName = tagName.replace(e, '')
+
+        try:
+            tagKey = (Tag.objects.get(name=tagName.capitalize())).sys_name
+            return redirect(postList, tag=tagKey)
+        except:
+            tagKey = 'not_found'
+            return redirect('/tags/not_found/')
+    else:
+        raise Http404
