@@ -11,6 +11,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Article, Flow, Tag, TagGroup
 #memcached: python-memcached, yum -y install memcached
 from django.core.cache import cache
+#forms
+from .forms import TagSearcher
 
 
 #--------------------------------------------------------
@@ -96,6 +98,9 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
     paginator = Paginator(query_list, cardsCount)
     page = request.GET.get('page')
 
+    #Серчер
+    searcher_form = TagSearcher()
+
     try:
         postObj_list = paginator.page(page)
     except PageNotAnInteger:
@@ -104,8 +109,9 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
         postObj_list = paginator.page(paginator.num_pages)
 
     return render(request, 'pages/cards.html', {
-        'postObj_list': postObj_list,
-        'page_title'  : page_title,
+        'postObj_list'  : postObj_list,
+        'page_title'    : page_title,
+        'searcher_form' : searcher_form,
     })
 
 
@@ -161,7 +167,7 @@ def tagsSearcher(request):
     ''' Логика проверки поля ввода + трансформация tagName в tagSysName '''
 
     if request.method == 'POST':
-        tagName = request.POST.get("tag")
+        tagName = request.POST.get('searcher')
         for e in '!@#$%^&()<>`"/\':;|': tagName = tagName.replace(e, '')
 
         try:
