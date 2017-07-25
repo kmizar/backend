@@ -2,15 +2,25 @@
 from django import forms
 from .models import Tag
 
+
 #Tag searcher form
 class TagSearcher(forms.Form):
+    tags = Tag.objects.all()
+
+
+
     OPTIONS = (
-        ("AUT", "Austria"),
-        ("DEU", "Germany"),
-        ("NLD", "Neitherlands"),
+        (tag.sys_name, tag.name)
+        for tag in tags
+
     )
 
-    searcher = forms.ChoiceField(choices=OPTIONS, required=True, label='', widget=forms.Select(attrs={'class':'js-example-basic-multiple','multiple':'multiple'}))
+
+    searcher = forms.MultipleChoiceField(choices=OPTIONS, required=True, label='', widget=forms.SelectMultiple(
+        attrs={
+            'class':'js-example-basic-multiple',
+            'style':'width:100%',
+        }))
 
 
 
@@ -21,9 +31,6 @@ class TagSearcher(forms.Form):
     #    'multiple': 'multiple',
     #})
     #widget=forms.Select(attrs={'class':'js-example-basic-multiple'})
-
-
-
 
 
     #searcher = forms.CharField(

@@ -42,17 +42,17 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
 
     #Фильтр статей по тегам
     elif tag:
-        try:
-            page_title = str(Tag.objects.get(sys_name = tag).name).title()
+        #try:
+        page_title = str(Tag.objects.get(sys_name = tag).name).title()
 
-            cache_key  = 'tag_{}'.format(tag)
-            query_list = cache.get(cache_key)
-            if not query_list:
-                query_list = Article.objects.filter(tags__sys_name=tag)
-                cache.set(cache_key, query_list, cacheTime)
+        cache_key  = 'tag_{}'.format(tag)
+        query_list = cache.get(cache_key)
+        if not query_list:
+            query_list = Article.objects.filter(tags__sys_name=tag)
+            cache.set(cache_key, query_list, cacheTime)
 
-        except:
-            return redirect(notFound)
+        #except:
+        #return redirect(notFound)
 
     #Фильтр статей по группам тегов
     elif group:
@@ -170,11 +170,11 @@ def tagsSearcher(request):
         tagName = request.POST.get('searcher')
         for e in '!@#$%^&()<>`"/\':;|': tagName = tagName.replace(e, '')
 
-        try:
-            tagKey = (Tag.objects.get(name=tagName.capitalize())).sys_name
-            return redirect(postList, tag=tagKey)
-        except:
-            return redirect(notFound)
+        #try:
+        #tagKey = (Tag.objects.get(sys_name=tagName.capitalize())).sys_name
+        return redirect(postList, tag=tagName)
+        #except:
+        #    return redirect(notFound)
     else:
         raise Http404
 
