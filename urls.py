@@ -8,14 +8,15 @@ urlpatterns = [
     url(r'^$', views.postList, name='home'),
     url(r'^flows/(?P<flow>[a-z0-9_]+)/$',              views.postList),
     url(r'^groups/(?P<group>[a-z0-9_]+)/$',            views.postList),
-    url(r'^tags/(?P<tag>[a-z0-9_]+)/$',                views.postList),
+    url(r'^tags/search/(?P<search>[a-zA-Z0-9_]+)$',                views.postList),
+    #url(r'^tags/(?P<tags>)/$',                views.postList),
     url(r'^groups-tags/(?P<group_tag>[a-z0-9_-]+)/$',  views.postList),
 
     #Страница - ничего не найдено
     url(r'^not_found/$', views.notFound),
 
     #Поиск по тегам, валидация формы
-    url(r'^tags/$',  views.tagsSearcher),
+    url(r'^search/$',  views.tagsSearcher),
 
     #Список рубрик и тегов
     url(r'^flows/$', views.flowList, name='flow'),

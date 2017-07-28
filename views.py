@@ -23,7 +23,7 @@ cardsCount = 15
 
 #--------------------------------------------------------
 #Funcs
-def postList(request, flow=None, tag=None, group=None, group_tag=None):
+def postList(request, flow=None, tag=None, search=None, group=None, group_tag=None):
     ''' Логика страницы со списком статей '''
 
     #Фильтр статей по потокам(хабам)
@@ -41,15 +41,19 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
             return redirect(notFound)
 
     #Фильтр статей по тегам
+    elif search:
+        page_title = 'searched'
+        query_list = Article.objects.filter(tags__name__in=search)
     elif tag:
         #try:
-        page_title = str(Tag.objects.get(sys_name = tag).name).title()
 
-        cache_key  = 'tag_{}'.format(tag)
-        query_list = cache.get(cache_key)
-        if not query_list:
-            query_list = Article.objects.filter(tags__sys_name=tag)
-            cache.set(cache_key, query_list, cacheTime)
+        page_title = 'qwerty'#str(Tag.objects.get(sys_name = tag).name).title()
+
+        #cache_key  = 'tag_{}'.format(tag)
+        #query_list = cache.get(cache_key)
+        #if not query_list:
+        query_list = Article.objects.filter(tags__sys_name=tag)
+            #cache.set(cache_key, query_list, cacheTime)
 
         #except:
         #return redirect(notFound)
@@ -112,6 +116,7 @@ def postList(request, flow=None, tag=None, group=None, group_tag=None):
         'postObj_list'  : postObj_list,
         'page_title'    : page_title,
         'searcher_form' : searcher_form,
+        'search': 'bad' if search is None else search,
     })
 
 
@@ -167,12 +172,12 @@ def tagsSearcher(request):
     ''' Логика проверки поля ввода + трансформация tagName в tagSysName '''
 
     if request.method == 'POST':
-        tagName = request.POST.get('searcher')
-        for e in '!@#$%^&()<>`"/\':;|': tagName = tagName.replace(e, '')
+        tagName = request.POST.getlist('searcher')
+        #for e in '!@#$%^&()<>`"/\':;|': tagName = tagName.replace(e, '')
 
         #try:
         #tagKey = (Tag.objects.get(sys_name=tagName.capitalize())).sys_name
-        return redirect(postList, tag=tagName)
+        return redirect(postList, search='_'.join(tagName))
         #except:
         #    return redirect(notFound)
     else:
