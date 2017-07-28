@@ -43,7 +43,8 @@ def postList(request, flow=None, tag=None, search=None, group=None, group_tag=No
     #Фильтр статей по тегам
     elif search:
         page_title = 'searched'
-        query_list = Article.objects.filter(tags__name__in=search)
+        search = search.split('_')
+        query_list = Article.objects.filter(tags__sys_name__in=search)
     elif tag:
         #try:
 
