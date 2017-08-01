@@ -15,6 +15,96 @@ from django.core.cache import cache
 from .forms import TagSearcher
 
 
+
+
+
+from backend import core
+
+class MainNoFilter(core.MainPage):
+    def getTitle(self, *kwargs):
+        return 'Test'
+
+    def getObjList(self, *kwargs):
+        return Article.objects.all()
+
+class MainFlowFilter(core.MainPage):
+
+    def getTitle(self, *kwargs):
+        return str(Flow.objects.get(
+            sys_name = kwargs[0]['flow']).name).title()
+
+    def getObjList(self, *kwargs):
+        return Article.objects.all()
+
+
+#class MyView(View):
+#    def __init__(self, arg=None):
+#        if arg is None:
+#            self.query_list = Article.objects.all()
+
+#    def get(self, request, *args, **kwargs):
+#        page_title = u'Последние статьи'
+#        query_list = self.query_list
+#
+#        query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
+#
+#        paginator = Paginator(query_list, cardsCount)
+#        page = request.GET.get('page')
+
+#        try:
+#            postObj_list = paginator.page(page)
+#        except PageNotAnInteger:
+#            postObj_list = paginator.page(1)
+#        except EmptyPage:
+#            postObj_list = paginator.page(paginator.num_pages)
+
+#        return render(request, 'pages/cards.html', {
+#            'postObj_list'  : postObj_list,
+#            'page_title'    : page_title,
+#            'searcher_form' : searcher_form,
+#            'search': 'bad' if search is None else search,
+#        })
+
+#class Test(MyView):
+#    def __init__(self, arg):
+
+
+#    query_list = Article.objects.all()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #--------------------------------------------------------
 #Const
 cacheTime  = 60*60*10
