@@ -15,87 +15,49 @@ from django.core.cache import cache
 from .forms import TagSearcher
 
 
-
-
-
 from backend import core
 
-class MainNoFilter(core.MainPage):
-    def getTitle(self, *kwargs):
-        return 'Test'
 
-    def getObjList(self, *kwargs):
+#------------------------------------------------------------------
+class MainNoFilter(core.MainPage):
+    ''' https://kmizar.com '''
+
+    def getTitle(self, *kwargs):
+        return u'Последние статьи'
+
+    def getQueryList(self, *kwargs):
         return Article.objects.all()
+
 
 class MainFlowFilter(core.MainPage):
+    ''' https://kmizar.com/flows/flow_name '''
 
-    def getTitle(self, *kwargs):
+    def getTitle(self, *args):
         return str(Flow.objects.get(
-            sys_name = kwargs[0]['flow']).name).title()
+            sys_name = args[0]['flow']).name).title()
 
-    def getObjList(self, *kwargs):
-        return Article.objects.all()
-
-
-#class MyView(View):
-#    def __init__(self, arg=None):
-#        if arg is None:
-#            self.query_list = Article.objects.all()
-
-#    def get(self, request, *args, **kwargs):
-#        page_title = u'Последние статьи'
-#        query_list = self.query_list
-#
-#        query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
-#
-#        paginator = Paginator(query_list, cardsCount)
-#        page = request.GET.get('page')
-
-#        try:
-#            postObj_list = paginator.page(page)
-#        except PageNotAnInteger:
-#            postObj_list = paginator.page(1)
-#        except EmptyPage:
-#            postObj_list = paginator.page(paginator.num_pages)
-
-#        return render(request, 'pages/cards.html', {
-#            'postObj_list'  : postObj_list,
-#            'page_title'    : page_title,
-#            'searcher_form' : searcher_form,
-#            'search': 'bad' if search is None else search,
-#        })
-
-#class Test(MyView):
-#    def __init__(self, arg):
+    def getQueryList(self, *args):
+        return Article.objects.filter(flow__sys_name=args[0]['flow'])
 
 
-#    query_list = Article.objects.all()
+class MainTagFilter(core.MainPage):
+    ''' https://kmizar.com/tags/tag_name '''
 
+    def getTitle(self, *args):
+        return str(Tag.objects.get(
+            sys_name = args[0]['tag']).name).title()
 
+    def getQueryList(self, *args):
+        return Article.objects.filter(tags__sys_name=args[0]['tag'])
 
+class MainGroupFilter(core.MainPage):
+    ''' https://kmizar.com/groups/group_name '''
 
+    def getTitle(self, *args):
+        return str(TagGroup.objects.get(sys_name = args[0]['group']).name).title()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def getQueryList(self, *args):
+        return Article.objects.filter(group__sys_name=args[0]['group'])
 
 
 

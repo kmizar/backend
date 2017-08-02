@@ -18,7 +18,7 @@ class TagSearcher(forms.Form):
 
     searcher = forms.MultipleChoiceField(choices=OPTIONS, required=True, label='', widget=forms.SelectMultiple(
         attrs={
-            #'class':'js-example-basic-multiple',
+            'class':'js-example-basic-multiple',
             'style':'width:100%',
         }))
 
