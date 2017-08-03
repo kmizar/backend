@@ -19,7 +19,7 @@ from backend import core
 
 
 #------------------------------------------------------------------
-class MainNoFilter(core.MainPage):
+class MainPageNoFilter(core.MainPage):
     ''' https://kmizar.com '''
 
     def getTitle(self, *kwargs):
@@ -29,7 +29,7 @@ class MainNoFilter(core.MainPage):
         return Article.objects.all()
 
 
-class MainFlowFilter(core.MainPage):
+class MainPageFlowFilter(core.MainPage):
     ''' https://kmizar.com/flows/flow_name '''
 
     def getTitle(self, *args):
@@ -40,7 +40,7 @@ class MainFlowFilter(core.MainPage):
         return Article.objects.filter(flow__sys_name=args[0]['flow'])
 
 
-class MainTagFilter(core.MainPage):
+class MainPageTagFilter(core.MainPage):
     ''' https://kmizar.com/tags/tag_name '''
 
     def getTitle(self, *args):
@@ -50,7 +50,8 @@ class MainTagFilter(core.MainPage):
     def getQueryList(self, *args):
         return Article.objects.filter(tags__sys_name=args[0]['tag'])
 
-class MainGroupFilter(core.MainPage):
+
+class MainPageGroupFilter(core.MainPage):
     ''' https://kmizar.com/groups/group_name '''
 
     def getTitle(self, *args):
@@ -59,6 +60,58 @@ class MainGroupFilter(core.MainPage):
     def getQueryList(self, *args):
         return Article.objects.filter(group__sys_name=args[0]['group'])
 
+
+class MainPageGroupTagFilter(core.MainPage):
+    ''' https://kmizar.com/groups-tags/group_tag '''
+
+    def getCache(self, *args):
+        return None, None
+
+    def getTitle(self, *args):
+        filterList = (args[0]['group_tag']).split('-')
+        return u'{} | {}'.format(
+            str(TagGroup.objects.get(sys_name=filterList[0]).name).title(),
+            str(Tag.objects.get(sys_name = filterList[1]).name).title()
+        )
+
+    def getQueryList(self, *args):
+        filterList = (args[0]['group_tag']).split('-')
+        return Article.objects.filter(group__sys_name=filterList[0])
+
+
+
+
+    #            filterList = group_tag.split('-')
+    #            page_title = u'{} | {}'.format(
+    #                str(TagGroup.objects.get(sys_name = filterList[0]).name).title(),
+    #                str(Tag.objects.get(sys_name = filterList[1]).name).title())
+    #            query_list = Article.objects.filter(group__sys_name=filterList[0], tags__sys_name=filterList[1])
+
+
+
+
+class FlowPage(core.FlowPage):
+    ''' https://kmizar.com/flows '''
+
+    def getFlowObjList(self, *args):
+        return Flow.objects.all()
+
+    def getGroupObjList(self, *args):
+        return TagGroup.objects.all()
+
+
+class ArticlePage(core.ArticlePage):
+    ''' https://kmizar.com/post/post_id '''
+
+    def postViewIncrement(self, postObj):
+        postObj.article_count += 1
+        postObj.save()
+
+    def getPostObj(self, *args):
+        postObj = get_object_or_404(Article, pk=args[0]['post'])
+        if not postObj.published_date: raise Http404()
+
+        return postObj
 
 
 

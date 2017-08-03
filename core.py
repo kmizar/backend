@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 #system
 from django.views.generic import View
-from django.shortcuts import redirect
-from django.shortcuts import render
-from django.http import Http404
+from django.http          import Http404
+
+from django.shortcuts     import redirect
+from django.shortcuts     import render
 
 #forms
 from .forms import TagSearcher
@@ -56,13 +57,13 @@ class MainPage(View):
     #Main part
     def get(self, request, **kwargs):
 
-        try:
-            page_title = self.getTitle(kwargs)
-        except:
-            return redirect(notFound)
+        #try:
+        page_title = self.getTitle(kwargs)
+        #except:
+        #    return redirect(notFound)
 
         query_list, cache_key = self.getCache(kwargs)
-        if not query_list:
+        if not query_list and cache_key:
             query_list = self.getQueryList(kwargs)
             cache.set(cache_key, query_list, self.cacheTime)
 
@@ -76,17 +77,66 @@ class MainPage(View):
         })
 
 
-class TagSearcher1(View):
+class FlowPage(View):
+    '''
+        Class for flows page.
+            - Get content from memchache
+            - Render page
+    '''
+
+    def __init__(self, **kwargs):
+        self.cacheTime = 60*60*10
+
+    #Try to get memcache content
+    def getCache(self, _cache_key):
+        return cache.get(_cache_key), _cache_key
+
+    #Main part
     def get(self, request, **kwargs):
-        if request.method == 'POST':
-            form = TagSearcher(request.POST)
 
-            if form.is_valid():
-                tagsList = self.getTagsList()
-                return redirect('yandex.ru')
+        flowObj_list, cache_key = self.getCache('flowObj_list')
+        if not flowObj_list:
+            flowObj_list = self.getFlowObjList(kwargs)
+            cache.set(cache_key, flowObj_list, self.cacheTime)
 
-            else:
-                return redirect('/')
+        groupObj_list, cache_key = self.getCache('groupObj_list')
+        if not groupObj_list:
+            groupObj_list = self.getGroupObjList(kwargs)
+            cache.set(cache_key, flowObj_list, self.cacheTime)
+
+        return render(request, 'pages/hubs.html', {
+            'flowObj_list'  : flowObj_list,
+            'groupObj_list' : groupObj_list,
+        })
+
+
+class ArticlePage(View):
+    '''
+        Class for flows page.
+            - Render page
+            - Include post views increment func
+            - Include recoman module
+    '''
+
+    #Main part
+    def get(self, request, **kwargs):
+
+        postObj = self.getPostObj(kwargs)
+        self.postViewIncrement(postObj)
+
+        #Include recoman
+        try:
+            from backend.services.recoman.recoman import Recoman
+            recoDumper = Recoman(postObj)
+            recoObj_list = recoDumper.getRecoData()
+
+        except ImportError:
+            recoObj_list = False
+
+        return render(request, 'pages/post.html', {
+            'recoObj_list' : recoObj_list,
+            'postObj'      : postObj,
+        })
 
 
 
