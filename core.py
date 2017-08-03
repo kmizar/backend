@@ -54,18 +54,33 @@ class MainPage(View):
 
         return cache.get(_cache_key), _cache_key
 
-    #Main part
+    #Main part GET-request
     def get(self, request, **kwargs):
 
-        #try:
-        page_title = self.getTitle(kwargs)
-        #except:
-        #    return redirect(notFound)
+        try:
+            page_title = self.getTitle(kwargs)
+        except:
+            return render(request, 'pages/cards.html', {})
 
         query_list, cache_key = self.getCache(kwargs)
-        if not query_list and cache_key:
+        if not query_list:
             query_list = self.getQueryList(kwargs)
             cache.set(cache_key, query_list, self.cacheTime)
+
+        query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
+        postObj_list = self.getPagination(query_list, request)
+
+        return render(request, 'pages/cards.html', {
+            'postObj_list' : postObj_list,
+            'page_title'   : page_title,
+            'search'       : TagSearcher(),
+        })
+
+    #Main part POST-request
+    def post(self, request, **kwargs):
+
+        page_title = self.getTitle(request.POST.getlist('searcher'))
+        query_list = self.getQueryList(request)
 
         query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
         postObj_list = self.getPagination(query_list, request)
@@ -91,7 +106,7 @@ class FlowPage(View):
     def getCache(self, _cache_key):
         return cache.get(_cache_key), _cache_key
 
-    #Main part
+    #Main part GET-request
     def get(self, request, **kwargs):
 
         flowObj_list, cache_key = self.getCache('flowObj_list')
@@ -118,7 +133,7 @@ class ArticlePage(View):
             - Include recoman module
     '''
 
-    #Main part
+    #Main part GET-request
     def get(self, request, **kwargs):
 
         postObj = self.getPostObj(kwargs)

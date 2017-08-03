@@ -55,7 +55,7 @@ class MainPageGroupFilter(core.MainPage):
     ''' https://kmizar.com/groups/group_name '''
 
     def getTitle(self, *args):
-        return str(TagGroup.objects.get(sys_name = args[0]['group']).name).title()
+        return str(TagGroup.objects.get(sys_name=args[0]['group']).name).title()
 
     def getQueryList(self, *args):
         return Article.objects.filter(group__sys_name=args[0]['group'])
@@ -71,21 +71,27 @@ class MainPageGroupTagFilter(core.MainPage):
         filterList = (args[0]['group_tag']).split('-')
         return u'{} | {}'.format(
             str(TagGroup.objects.get(sys_name=filterList[0]).name).title(),
-            str(Tag.objects.get(sys_name = filterList[1]).name).title()
+            str(Tag.objects.get(sys_name=filterList[1]).name).title()
         )
 
     def getQueryList(self, *args):
         filterList = (args[0]['group_tag']).split('-')
-        return Article.objects.filter(group__sys_name=filterList[0])
+        return Article.objects.filter(group__sys_name=filterList[0],tags__sys_name=filterList[1])
 
 
+class MainPageSearchFilter(core.MainPage):
+    ''' https://kmizar.com/search/ '''
+
+    def getTitle(self, request):
+        if request.method == 'POST':
+            return  request#u'Результат поиска'
+
+    def getQueryList(self, request):
+        search_args = request.POST.getlist('searcher')
 
 
-    #            filterList = group_tag.split('-')
-    #            page_title = u'{} | {}'.format(
-    #                str(TagGroup.objects.get(sys_name = filterList[0]).name).title(),
-    #                str(Tag.objects.get(sys_name = filterList[1]).name).title())
-    #            query_list = Article.objects.filter(group__sys_name=filterList[0], tags__sys_name=filterList[1])
+        return Article.objects.all()
+
 
 
 
