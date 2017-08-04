@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
+#system
 from django.contrib import admin
+#database
 from .models import Article, Flow, Tag, TagGroup
 
 #------------------------------------------
 #Override django admin
-
 class ArticleAdmin(admin.ModelAdmin):
     readonly_fields = ('article_count',)
-
 
 #------------------------------------------
 #Register models
