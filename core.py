@@ -23,10 +23,12 @@ class MainPage(View):
             - Create paginator
             - Get content from memchache
             - Render page
-            - Include searcher
+            - Include searcher (post request)
     '''
 
     def __init__(self, **kwargs):
+        self.searcher_form = TagSearcher()
+
         self.kwargs = kwargs
         self.cacheTime = 60*60*10
         self.cardsCount = 15
@@ -71,24 +73,24 @@ class MainPage(View):
         postObj_list = self.getPagination(query_list, request)
 
         return render(request, 'pages/cards.html', {
-            'postObj_list' : postObj_list,
-            'page_title'   : page_title,
-            'search'       : TagSearcher(),
+            'postObj_list'  : postObj_list,
+            'page_title'    : page_title,
+            'searcher_form' : self.searcher_form,
         })
 
     #Main part POST-request
     def post(self, request, **kwargs):
 
-        page_title = self.getTitle(request.POST.getlist('searcher'))
+        page_title = self.getTitle()
         query_list = self.getQueryList(request)
 
         query_list = query_list.filter(published_date__isnull=False).order_by('-published_date')
         postObj_list = self.getPagination(query_list, request)
 
         return render(request, 'pages/cards.html', {
-            'postObj_list' : postObj_list,
-            'page_title'   : page_title,
-            'search'       : TagSearcher(),
+            'postObj_list'  : postObj_list,
+            'page_title'    : page_title,
+            'searcher_form' : self.searcher_form,
         })
 
 
@@ -152,24 +154,3 @@ class ArticlePage(View):
             'recoObj_list' : recoObj_list,
             'postObj'      : postObj,
         })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
